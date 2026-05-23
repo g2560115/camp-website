@@ -197,7 +197,7 @@
   <div class="legend-item"><div class="legend-color" style="background:#f0d060; border:1px solid #aaa"></div>✨ また行きたい（右クリック）</div>
 </div>
 
-<div id="hint">左クリック → 色を塗る　／　右クリック → また行きたい　／　ダブルクリック → 市区町村を表示</div>
+<div id="hint">左クリック → 訪問回数を増やす（色が濃くなる）　／　右クリック → レベル切り替え（訪れた→泊まった→住んだ→未訪問）　／　ダブルクリック → 市区町村を表示</div>
 
 <div id="breadcrumb">
   <button id="back-btn">← 日本全体に戻る</button>
@@ -214,26 +214,48 @@
 
 <script>
   const LEVELS = ['none', 'visited', 'stayed', 'lived'];
-  const COLORS = { none: '#2a2a4a', visited: '#88dd44', stayed: '#50c8e8', lived: '#f06080' };
+  // 各レベルの基本色 (HSL で管理)
+  const BASE_HSL = {
+    visited: { h: 90,  s: 65, l: 55 },  // 黄緑
+    stayed:  { h: 195, s: 70, l: 60 },  // 水色
+    lived:   { h: 340, s: 80, l: 65 },  // ピンク
+  };
+  const COLORS = { none: '#2a2a4a' };
   const LABELS = { none: '未訪問', visited: '訪れた', stayed: '泊まった', lived: '住んだ' };
 
-  let visitPref = JSON.parse(localStorage.getItem('visitPref') || '{}');
-  let visitCity = JSON.parse(localStorage.getItem('visitCity') || '{}');
-  let wantReturn = JSON.parse(localStorage.getItem('wantReturn') || '{}'); // また行きたいフラグ
+  // カウントに応じて色を濃くする（l を下げる、s を上げる）
+  function colorForLevel(level, count) {
+    if (level === 'none' || !level) return COLORS.none;
+    const base = BASE_HSL[level];
+    if (!base) return '#888';
+    const c = Math.min(count || 1, 10);
+    const l = Math.max(base.l - (c - 1) * 4, 20);
+    const s = Math.min(base.s + (c - 1) * 3, 95);
+    return `hsl(${base.h},${s}%,${l}%)`;
+  }
+
+  // データ形式: { level: 'visited', count: 3 }
+  let visitPref = JSON.parse(localStorage.getItem('visitPref2') || '{}');
+  let visitCity = JSON.parse(localStorage.getItem('visitCity2') || '{}');
+  let wantReturn = JSON.parse(localStorage.getItem('wantReturn') || '{}');
 
   function save() {
-    localStorage.setItem('visitPref', JSON.stringify(visitPref));
-    localStorage.setItem('visitCity', JSON.stringify(visitCity));
+    localStorage.setItem('visitPref2', JSON.stringify(visitPref));
+    localStorage.setItem('visitCity2', JSON.stringify(visitCity));
     localStorage.setItem('wantReturn', JSON.stringify(wantReturn));
   }
+
+  function getLevel(data) { return (data && data.level) ? data.level : 'none'; }
+  function getCount(data) { return (data && data.count) ? data.count : 0; }
 
   function updateCounter() {
     const all = Object.assign({}, visitPref, visitCity);
     let lived = 0, stayed = 0, visited = 0;
     Object.values(all).forEach(v => {
-      if (v === 'lived')   lived++;
-      if (v === 'stayed')  stayed++;
-      if (v === 'visited') visited++;
+      const lv = getLevel(v);
+      if (lv === 'lived')   lived++;
+      if (lv === 'stayed')  stayed++;
+      if (lv === 'visited') visited++;
     });
     const returnCount = Object.keys(wantReturn).length;
     document.getElementById('c-lived').textContent   = lived;
@@ -299,11 +321,14 @@
     save(); updateCounter();
   }
 
-  function showTooltip(e, name, level) {
+  function showTooltip(e, name, data) {
+    const lv = getLevel(data);
+    const cnt = getCount(data);
     tooltip.style.display = 'block';
     tooltip.style.left = (e.clientX + 14) + 'px';
     tooltip.style.top  = (e.clientY - 34) + 'px';
-    tooltip.textContent = name + '：' + level;
+    const countStr = lv !== 'none' ? `（${cnt}回）` : '';
+    tooltip.textContent = name + '：' + LABELS[lv] + countStr;
   }
 
   function hideTooltip() { tooltip.style.display = 'none'; }
@@ -334,16 +359,26 @@
       .append('path')
       .attr('class', 'prefecture')
       .attr('d', path)
-      .attr('fill', d => COLORS[visitPref[getPrefId(d)] || 'none'])
+      .attr('fill', d => {
+        const v = visitPref[getPrefId(d)];
+        return colorForLevel(getLevel(v), getCount(v));
+      })
       .on('mousemove', (e, d) => {
-        showTooltip(e, getPrefName(d), LABELS[visitPref[getPrefId(d)] || 'none']);
+        showTooltip(e, getPrefName(d), visitPref[getPrefId(d)]);
       })
       .on('mouseleave', hideTooltip)
       .on('click', (e, d) => {
         const id = getPrefId(d);
-        const next = nextLevel(visitPref[id] || 'none');
-        if (next === 'none') delete visitPref[id]; else visitPref[id] = next;
-        d3.select(e.currentTarget).attr('fill', COLORS[next]);
+        const cur = visitPref[id] || { level: 'none', count: 0 };
+        const lv = getLevel(cur);
+        if (lv === 'none') {
+          // 未訪問 → 訪れた1回
+          visitPref[id] = { level: 'visited', count: 1 };
+        } else {
+          // 同じレベルで回数を増やす
+          visitPref[id] = { level: lv, count: getCount(cur) + 1 };
+        }
+        d3.select(e.currentTarget).attr('fill', colorForLevel(visitPref[id].level, visitPref[id].count));
         save(); updateCounter();
       })
       .on('dblclick', (e, d) => {
@@ -352,7 +387,17 @@
       })
       .on('contextmenu', (e, d) => {
         e.preventDefault();
-        toggleReturn(getPrefId(d), d);
+        const id = getPrefId(d);
+        const cur = visitPref[id] || { level: 'none', count: 0 };
+        const nextLv = nextLevel(getLevel(cur));
+        if (nextLv === 'none') {
+          delete visitPref[id];
+        } else {
+          visitPref[id] = { level: nextLv, count: Math.max(1, getCount(cur)) };
+        }
+        const newData = visitPref[id];
+        d3.select(e.currentTarget).attr('fill', colorForLevel(getLevel(newData), getCount(newData)));
+        save(); updateCounter();
       });
 
     // 保存済みキラキラを復元
@@ -410,23 +455,38 @@
           .attr('class', 'city')
           .attr('d', path)
           .attr('fill', d => {
-            const id = getCityId(d, prefId);
-            return COLORS[visitCity[id] || 'none'];
+            const v = visitCity[getCityId(d, prefId)];
+            return colorForLevel(getLevel(v), getCount(v));
           })
           .on('mousemove', (e, d) => {
-            showTooltip(e, getCityName(d), LABELS[visitCity[getCityId(d, prefId)] || 'none']);
+            showTooltip(e, getCityName(d), visitCity[getCityId(d, prefId)]);
           })
           .on('mouseleave', hideTooltip)
           .on('click', (e, d) => {
             const id = getCityId(d, prefId);
-            const next = nextLevel(visitCity[id] || 'none');
-            if (next === 'none') delete visitCity[id]; else visitCity[id] = next;
-            d3.select(e.currentTarget).attr('fill', COLORS[next]);
+            const cur = visitCity[id] || { level: 'none', count: 0 };
+            const lv = getLevel(cur);
+            if (lv === 'none') {
+              visitCity[id] = { level: 'visited', count: 1 };
+            } else {
+              visitCity[id] = { level: lv, count: getCount(cur) + 1 };
+            }
+            d3.select(e.currentTarget).attr('fill', colorForLevel(visitCity[id].level, visitCity[id].count));
             save(); updateCounter();
           })
           .on('contextmenu', (e, d) => {
             e.preventDefault();
-            toggleReturn(getCityId(d, prefId), d);
+            const id = getCityId(d, prefId);
+            const cur = visitCity[id] || { level: 'none', count: 0 };
+            const nextLv = nextLevel(getLevel(cur));
+            if (nextLv === 'none') {
+              delete visitCity[id];
+            } else {
+              visitCity[id] = { level: nextLv, count: Math.max(1, getCount(cur)) };
+            }
+            const newData = visitCity[id];
+            d3.select(e.currentTarget).attr('fill', colorForLevel(getLevel(newData), getCount(newData)));
+            save(); updateCounter();
           });
       })
       .catch(err => {
