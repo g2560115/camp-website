@@ -1,46 +1,226 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <title>赤色のポケモン図鑑</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <title>ポケモンガチャ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
-    h1 {
-      text-align: center;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100vh;
+      background-color: #80c840;
+      font-family: 'Press Start 2P', monospace;
+      image-rendering: pixelated;
+      overflow-x: hidden;
     }
 
-    #controls {
+    /* タイル状の草地背景 */
+    body {
+      background-image:
+        /* 草タイルのドット模様 */
+        repeating-linear-gradient(0deg,   transparent 0px, transparent 15px, rgba(0,0,0,0.06) 15px, rgba(0,0,0,0.06) 16px),
+        repeating-linear-gradient(90deg,  transparent 0px, transparent 15px, rgba(0,0,0,0.06) 15px, rgba(0,0,0,0.06) 16px);
+      background-size: 16px 16px;
+    }
+
+    /* 上下の木のボーダー */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 32px;
+      background: repeating-linear-gradient(90deg, #186820 0px, #186820 14px, #2c8c2c 14px, #2c8c2c 16px);
+      border-bottom: 4px solid #0c4010;
+      z-index: 100;
+      image-rendering: pixelated;
+    }
+
+    /* コンテンツ */
+    #content {
+      position: relative;
+      z-index: 1;
+      padding-top: 48px;
+      padding-bottom: 48px;
+    }
+
+    /* タイトルウィンドウ */
+    .pixel-window {
+      background: #f8f8d0;
+      border: 4px solid #181818;
+      box-shadow: 4px 4px 0 #181818;
+      padding: 16px 20px;
+      margin: 0 auto 24px;
+      max-width: 480px;
+      image-rendering: pixelated;
+    }
+
+    .pixel-window h1 {
+      font-size: 0.85em;
+      color: #181818;
       text-align: center;
+      line-height: 1.8;
+    }
+
+    /* マシンエリア */
+    #machine-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       margin-bottom: 24px;
     }
 
-    #pokedex {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    /* ガチャマシン本体（ドット絵風） */
+    #machine {
+      position: relative;
+      width: 200px;
+      height: 220px;
+      user-select: none;
+    }
+
+    .machine-dome {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 128px;
+      height: 96px;
+      background: #a8d8f0;
+      border-radius: 50% 50% 40% 40%;
+      border: 4px solid #181818;
+      box-shadow: 4px 4px 0 #181818;
+      overflow: hidden;
+    }
+
+    .dome-inside {
+      position: absolute;
+      bottom: 4px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 2em;
+    }
+
+    .machine-body {
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 140px;
+      background: #e82020;
+      border: 4px solid #181818;
+      box-shadow: 4px 4px 0 #181818;
+      border-radius: 0 0 8px 8px;
+    }
+
+    /* つまみ */
+    #knob-wrapper {
+      position: absolute;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      cursor: grab;
+    }
+
+    #knob-wrapper:active { cursor: grabbing; }
+
+    #knob {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #f8c800;
+      border: 4px solid #181818;
+      box-shadow: 4px 4px 0 #181818;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    #knob::after {
+      content: '';
+      position: absolute;
+      top: 6px; left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 14px;
+      background: #181818;
+      border-radius: 2px;
+    }
+
+    #progress-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* ヒントウィンドウ */
+    #hint-window {
+      background: #f8f8d0;
+      border: 4px solid #181818;
+      box-shadow: 4px 4px 0 #181818;
+      padding: 12px 16px;
+      margin-top: 12px;
+      font-size: 0.55em;
+      color: #181818;
+      text-align: center;
+      line-height: 2;
+      min-width: 260px;
+    }
+
+    /* 結果ウィンドウ */
+    #result-area {
+      display: flex;
+      justify-content: center;
       gap: 16px;
+      flex-wrap: wrap;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 16px 48px;
+      min-height: 200px;
+    }
+
+    @keyframes pop-in {
+      0%   { opacity: 0; transform: scale(0.2); }
+      60%  { transform: scale(1.15); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
     .pokemon-card {
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 12px;
+      background: #f8f8d0;
+      border: 4px solid #181818;
+      box-shadow: 4px 4px 0 #181818;
+      padding: 12px 10px 10px;
       text-align: center;
-      background: #f9f9f9;
+      width: 148px;
+      cursor: pointer;
+      opacity: 0;
+      position: relative;
+    }
+
+    .pokemon-card.show {
+      animation: pop-in 0.4s steps(8) forwards;
+    }
+
+    .pokemon-card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 #181818;
     }
 
     .pokemon-card img {
-      width: 96px;
-      height: 96px;
+      width: 80px;
+      height: 80px;
+      image-rendering: pixelated;
     }
 
     .pokemon-card .number {
-      font-size: 0.8em;
-      color: #888;
+      font-size: 0.45em;
+      color: #606060;
+      margin-bottom: 4px;
     }
 
     .pokemon-card .name {
-      font-weight: bold;
-      font-size: 1em;
-      margin: 4px 0;
+      font-size: 0.55em;
+      color: #181818;
+      margin: 4px 0 6px;
+      line-height: 1.6;
     }
 
     .types {
@@ -48,47 +228,72 @@
       justify-content: center;
       gap: 4px;
       flex-wrap: wrap;
-      margin-top: 4px;
     }
 
     .type-badge {
-      font-size: 0.75em;
-      padding: 2px 8px;
-      border-radius: 999px;
-      color: white;
-      font-weight: bold;
+      font-size: 0.4em;
+      padding: 2px 6px;
+      border: 2px solid #181818;
+      color: #181818;
+      background: #d0d0d0;
+      font-family: 'Press Start 2P', monospace;
     }
-    .type-normal   { background: #A8A878; }
-    .type-fire     { background: #F08030; }
-    .type-water    { background: #6890F0; }
-    .type-electric { background: #F8D030; color: #333; }
-    .type-grass    { background: #78C850; }
-    .type-ice      { background: #98D8D8; color: #333; }
-    .type-fighting { background: #C03028; }
-    .type-poison   { background: #A040A0; }
-    .type-ground   { background: #E0C068; color: #333; }
-    .type-flying   { background: #A890F0; }
-    .type-psychic  { background: #F85888; }
-    .type-bug      { background: #A8B820; }
-    .type-rock     { background: #B8A038; }
-    .type-ghost    { background: #705898; }
-    .type-dragon   { background: #7038F8; }
-    .type-dark     { background: #705848; }
-    .type-steel    { background: #B8B8D0; color: #333; }
-    .type-fairy    { background: #EE99AC; color: #333; }
+
+    /* タイプ色 */
+    .type-normal   { background: #c8c880; }
+    .type-fire     { background: #f8a040; }
+    .type-water    { background: #88a8f8; }
+    .type-electric { background: #f8e040; }
+    .type-grass    { background: #80c840; }
+    .type-ice      { background: #98d8d8; }
+    .type-fighting { background: #e05828; }
+    .type-poison   { background: #c040c0; color: white; }
+    .type-ground   { background: #d8b858; }
+    .type-flying   { background: #a890f0; }
+    .type-psychic  { background: #f870a0; }
+    .type-bug      { background: #a8b820; }
+    .type-rock     { background: #b8a038; }
+    .type-ghost    { background: #705898; color: white; }
+    .type-dragon   { background: #7038f8; color: white; }
+    .type-dark     { background: #705848; color: white; }
+    .type-steel    { background: #b8b8d0; }
+    .type-fairy    { background: #f8b8d8; }
   </style>
 </head>
 <body>
 
-<main class="container">
-  <h1>赤色のポケモン図鑑</h1>
+<div id="content">
 
-  <div id="controls">
-    <p id="status">読み込み中...</p>
+  <div class="pixel-window">
+    <h1>★ POKEMON GACHA ★</h1>
   </div>
 
-  <div id="pokedex"></div>
-</main>
+  <div id="machine-area">
+    <div id="machine">
+      <div class="machine-dome">
+        <div class="dome-inside">🔴</div>
+      </div>
+      <div class="machine-body"></div>
+      <div id="knob-wrapper">
+        <svg id="progress-ring" width="80" height="80">
+          <circle cx="40" cy="40" r="32" fill="none" stroke="#606060" stroke-width="4"/>
+          <circle id="ring-fill" cx="40" cy="40" r="32" fill="none"
+            stroke="#f8c800" stroke-width="4"
+            stroke-dasharray="201"
+            stroke-dashoffset="201"
+            stroke-linecap="butt"
+            transform="rotate(-90 40 40)"/>
+        </svg>
+        <div id="knob"></div>
+      </div>
+    </div>
+
+    <div id="hint-window">つまみをぐるっと回してね！</div>
+  </div>
+
+  <div id="result-area"></div>
+
+</div>
 
 <script>
   const typeNames = {
@@ -98,6 +303,68 @@
     rock: 'いわ', ghost: 'ゴースト', dragon: 'ドラゴン', dark: 'あく',
     steel: 'はがね', fairy: 'フェアリー'
   };
+
+  const knob = document.getElementById('knob');
+  const knobWrapper = document.getElementById('knob-wrapper');
+  const ringFill = document.getElementById('ring-fill');
+  const hint = document.getElementById('hint-window');
+  const CIRCUMFERENCE = 201;
+  const REQUIRED_DEG = 360;
+
+  let isDragging = false;
+  let totalDeg = 0;
+  let lastAngle = null;
+  let fired = false;
+
+  function getAngle(e, el) {
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return Math.atan2(clientY - cy, clientX - cx) * (180 / Math.PI);
+  }
+
+  function onStart(e) {
+    if (fired) return;
+    isDragging = true;
+    lastAngle = getAngle(e, knob);
+    e.preventDefault();
+  }
+
+  function onMove(e) {
+    if (!isDragging || fired) return;
+    e.preventDefault();
+    const angle = getAngle(e, knob);
+    let delta = angle - lastAngle;
+    if (delta > 180) delta -= 360;
+    if (delta < -180) delta += 360;
+    if (delta > 0) totalDeg += delta;
+    lastAngle = angle;
+
+    knob.style.transform = `rotate(${totalDeg}deg)`;
+    const progress = Math.min(totalDeg / REQUIRED_DEG, 1);
+    ringFill.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+
+    if (progress < 0.5)     hint.textContent = 'もっと回して！';
+    else if (progress < 1)  hint.textContent = 'あと少し！';
+
+    if (totalDeg >= REQUIRED_DEG && !fired) {
+      fired = true;
+      isDragging = false;
+      hint.textContent = '★ GACHA! ★';
+      spinGacha();
+    }
+  }
+
+  function onEnd() { isDragging = false; }
+
+  knobWrapper.addEventListener('mousedown', onStart);
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onEnd);
+  knobWrapper.addEventListener('touchstart', onStart, { passive: false });
+  window.addEventListener('touchmove', onMove, { passive: false });
+  window.addEventListener('touchend', onEnd);
 
   function fetchPokemon(number) {
     return Promise.all([
@@ -109,12 +376,13 @@
         number: number,
         name: jaName ? jaName.name : data.name,
         image: data.sprites.front_default,
-        types: data.types.map(t => t.type.name)
+        types: data.types.map(t => t.type.name),
+        cry: data.cries && data.cries.latest ? data.cries.latest : null
       };
     });
   }
 
-  function createCard(pokemon) {
+  function createCard(pokemon, delay) {
     let card = document.createElement('div');
     card.className = 'pokemon-card';
 
@@ -129,33 +397,36 @@
       <div class="name">${pokemon.name}</div>
       <div class="types">${typeBadges}</div>
     `;
+    card.addEventListener('click', function() {
+      if (pokemon.cry) new Audio(pokemon.cry).play();
+    });
+    setTimeout(function() { card.classList.add('show'); }, delay);
     return card;
   }
 
-  function loadRedPokedex() {
-    let pokedex = document.getElementById('pokedex');
-    let status = document.getElementById('status');
+  function spinGacha() {
+    const result = document.getElementById('result-area');
+    result.innerHTML = '';
 
-    fetch('https://pokeapi.co/api/v2/pokemon-color/red')
-      .then(r => r.json())
-      .then(function(colorData) {
-        let species = colorData.pokemon_species;
-        status.textContent = `赤色のポケモン: ${species.length}匹`;
+    let numbers = [];
+    while (numbers.length < 3) {
+      let n = Math.floor(Math.random() * 898) + 1;
+      if (!numbers.includes(n)) numbers.push(n);
+    }
 
-        let numbers = species.map(function(s) {
-          let parts = s.url.split('/').filter(p => p);
-          return parseInt(parts[parts.length - 1]);
-        }).filter(n => n <= 898).sort((a, b) => a - b);
-
-        numbers.forEach(function(number) {
-          fetchPokemon(number).then(function(pokemon) {
-            pokedex.appendChild(createCard(pokemon));
-          });
-        });
+    Promise.all(numbers.map(fetchPokemon)).then(function(pokemons) {
+      pokemons.forEach(function(pokemon, i) {
+        result.appendChild(createCard(pokemon, i * 500));
       });
+      setTimeout(function() {
+        totalDeg = 0;
+        fired = false;
+        knob.style.transform = 'rotate(0deg)';
+        ringFill.style.strokeDashoffset = CIRCUMFERENCE;
+        hint.textContent = 'もう一回！つまみを回してね';
+      }, 2500);
+    });
   }
-
-  loadRedPokedex();
 </script>
 
 </body>
