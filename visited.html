@@ -99,6 +99,14 @@
       font-size: 0.85em;
     }
 
+    #hint {
+      text-align: center;
+      font-size: 0.75em;
+      color: #555;
+      padding: 4px;
+      background: #16213e;
+    }
+
     #map-container {
       display: flex;
       justify-content: center;
@@ -121,6 +129,12 @@
       stroke-width: 1;
     }
 
+    .prefecture.selected, .city.selected {
+      stroke: #fff;
+      stroke-width: 2;
+      filter: brightness(1.2);
+    }
+
     #tooltip {
       position: fixed;
       background: rgba(0,0,0,0.88);
@@ -134,6 +148,172 @@
       white-space: nowrap;
       border: 1px solid #334;
     }
+
+    /* パネル */
+    #panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #16213e;
+      border: 1px solid #2a4a80;
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+      padding: 20px 24px;
+      z-index: 300;
+      min-width: 260px;
+      max-width: 320px;
+      display: none;
+    }
+
+    #panel.visible { display: block; }
+
+    #panel-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 299;
+      display: none;
+    }
+
+    #panel-overlay.visible { display: block; }
+
+    #panel-title {
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #e0e0ff;
+      margin-bottom: 16px;
+      padding-right: 24px;
+    }
+
+    #panel-close {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 1.3em;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    #panel-close:hover { color: white; }
+
+    .panel-section {
+      margin-bottom: 16px;
+    }
+
+    .panel-label {
+      font-size: 0.72em;
+      color: #888;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    /* レベルボタン */
+    #panel-levels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .level-btn {
+      padding: 8px 6px;
+      border: 2px solid transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.78em;
+      font-family: inherit;
+      background: #0f1e36;
+      color: #aaa;
+      transition: all 0.12s;
+      text-align: center;
+    }
+
+    .level-btn:hover { border-color: #4a7aaa; color: white; }
+
+    .level-btn.active-none    { background: #2a2a4a; color: #888; border-color: #4a4a8a; }
+    .level-btn.active-visited { background: #2a4a1a; color: #88dd44; border-color: #88dd44; }
+    .level-btn.active-stayed  { background: #0a3a4a; color: #50c8e8; border-color: #50c8e8; }
+    .level-btn.active-lived   { background: #4a1a2a; color: #f06080; border-color: #f06080; }
+
+    /* カウント */
+    #panel-count-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .count-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid #2a4a80;
+      background: #0f1e36;
+      color: white;
+      font-size: 1.3em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s;
+    }
+
+    .count-btn:hover { background: #1a3a60; }
+    .count-btn:disabled { opacity: 0.3; cursor: default; }
+
+    #panel-count-val {
+      font-size: 1.4em;
+      font-weight: bold;
+      color: #e0e0ff;
+      min-width: 32px;
+      text-align: center;
+    }
+
+    #panel-count-label {
+      font-size: 0.75em;
+      color: #888;
+    }
+
+    /* また行きたいボタン */
+    #panel-return-btn {
+      width: 100%;
+      padding: 9px;
+      border-radius: 6px;
+      border: 2px solid #554a20;
+      background: #1a1a2e;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 0.82em;
+      font-family: inherit;
+      transition: all 0.12s;
+    }
+
+    #panel-return-btn.active {
+      background: #2a2a10;
+      border-color: #f0d060;
+      color: #f0d060;
+    }
+
+    #panel-return-btn:hover { border-color: #f0d060; color: #f0d060; }
+
+    /* 市区町村ボタン */
+    #panel-drill-btn {
+      width: 100%;
+      padding: 9px;
+      border-radius: 6px;
+      border: 1px solid #2a4a80;
+      background: #0f3460;
+      color: #aae;
+      cursor: pointer;
+      font-size: 0.82em;
+      font-family: inherit;
+      transition: background 0.12s;
+      display: none;
+    }
+
+    #panel-drill-btn:hover { background: #1a5080; color: white; }
 
     #reset-btn {
       position: fixed;
@@ -151,14 +331,6 @@
     }
 
     #reset-btn:hover { background: #e05c5c; color: white; border-color: #e05c5c; }
-
-    #hint {
-      text-align: center;
-      font-size: 0.75em;
-      color: #555;
-      padding: 4px;
-      background: #16213e;
-    }
 
     /* キラキラ */
     .sparkle {
@@ -189,15 +361,15 @@
 </header>
 
 <div id="legend">
-  <span>クリックで切り替え:</span>
+  <span>凡例:</span>
   <div class="legend-item"><div class="legend-color" style="background:#2a2a4a"></div>未訪問</div>
   <div class="legend-item"><div class="legend-color" style="background:#88dd44"></div>訪れた</div>
   <div class="legend-item"><div class="legend-color" style="background:#50c8e8"></div>泊まった</div>
   <div class="legend-item"><div class="legend-color" style="background:#f06080"></div>住んだ</div>
-  <div class="legend-item"><div class="legend-color" style="background:#f0d060; border:1px solid #aaa"></div>✨ また行きたい（右クリック）</div>
+  <div class="legend-item"><div class="legend-color" style="background:#f0d060; border:1px solid #aaa"></div>✨ また行きたい</div>
 </div>
 
-<div id="hint">左クリック → 訪問回数を増やす（色が濃くなる）　／　右クリック → レベル切り替え（訪れた→泊まった→住んだ→未訪問）　／　ダブルクリック → 市区町村を表示</div>
+<div id="hint">地域をクリックするとパネルが開きます</div>
 
 <div id="breadcrumb">
   <button id="back-btn">← 日本全体に戻る</button>
@@ -209,32 +381,66 @@
   <svg id="japan-map" width="700" height="720"></svg>
 </div>
 
+<!-- パネルオーバーレイ -->
+<div id="panel-overlay"></div>
+
+<!-- コントロールパネル -->
+<div id="panel">
+  <div id="panel-title">東京都</div>
+  <button id="panel-close">×</button>
+
+  <div class="panel-section">
+    <div class="panel-label">訪問状態</div>
+    <div id="panel-levels">
+      <button class="level-btn" data-level="none">未訪問</button>
+      <button class="level-btn" data-level="visited">訪れた</button>
+      <button class="level-btn" data-level="stayed">泊まった</button>
+      <button class="level-btn" data-level="lived">住んだ</button>
+    </div>
+  </div>
+
+  <div class="panel-section" id="panel-count-section">
+    <div class="panel-label">訪問回数</div>
+    <div id="panel-count-row">
+      <button class="count-btn" id="count-minus">－</button>
+      <span id="panel-count-val">0</span>
+      <span id="panel-count-label">回</span>
+      <button class="count-btn" id="count-plus">＋</button>
+    </div>
+  </div>
+
+  <div class="panel-section">
+    <button id="panel-return-btn">✨ また行きたい</button>
+  </div>
+
+  <div class="panel-section">
+    <button id="panel-drill-btn">🏘 市区町村を見る →</button>
+  </div>
+</div>
+
 <div id="tooltip"></div>
 <button id="reset-btn">全リセット</button>
 
 <script>
   const LEVELS = ['none', 'visited', 'stayed', 'lived'];
-  // 各レベルの基本色 (HSL で管理)
   const BASE_HSL = {
-    visited: { h: 90,  s: 65, l: 55 },  // 黄緑
-    stayed:  { h: 195, s: 70, l: 60 },  // 水色
-    lived:   { h: 340, s: 80, l: 65 },  // ピンク
+    visited: { h: 90,  s: 35, l: 78 },  // 1回目: 薄い黄緑
+    stayed:  { h: 195, s: 40, l: 80 },  // 1回目: 薄い水色
+    lived:   { h: 340, s: 45, l: 82 },  // 1回目: 薄いピンク
   };
   const COLORS = { none: '#2a2a4a' };
   const LABELS = { none: '未訪問', visited: '訪れた', stayed: '泊まった', lived: '住んだ' };
 
-  // カウントに応じて色を濃くする（l を下げる、s を上げる）
   function colorForLevel(level, count) {
     if (level === 'none' || !level) return COLORS.none;
     const base = BASE_HSL[level];
     if (!base) return '#888';
     const c = Math.min(count || 1, 10);
-    const l = Math.max(base.l - (c - 1) * 4, 20);
-    const s = Math.min(base.s + (c - 1) * 3, 95);
+    const l = Math.max(base.l - (c - 1) * 6, 22);
+    const s = Math.min(base.s + (c - 1) * 7, 95);
     return `hsl(${base.h},${s}%,${l}%)`;
   }
 
-  // データ形式: { level: 'visited', count: 3 }
   let visitPref = JSON.parse(localStorage.getItem('visitPref2') || '{}');
   let visitCity = JSON.parse(localStorage.getItem('visitCity2') || '{}');
   let wantReturn = JSON.parse(localStorage.getItem('wantReturn') || '{}');
@@ -271,7 +477,7 @@
   const breadText = document.getElementById('breadcrumb-text');
   const svg       = d3.select('#japan-map');
   const W = 700, H = 720;
-  let currentMode = 'pref'; // 'pref' or 'city'
+  let currentMode = 'pref';
   let prefFeatures = [];
 
   const projection = d3.geoMercator()
@@ -281,10 +487,9 @@
 
   const path = d3.geoPath().projection(projection);
   const g = svg.append('g');
-
-  // キラキラ管理
   const sparkleGroup = svg.append('g').attr('id', 'sparkle-layer');
 
+  // ---- スパークル ----
   function addSparkles(id, feature) {
     removeSparkles(id);
     const centroid = path.centroid(feature);
@@ -310,17 +515,7 @@
     sparkleGroup.selectAll(`[data-id="${id}"]`).remove();
   }
 
-  function toggleReturn(id, feature) {
-    if (wantReturn[id]) {
-      delete wantReturn[id];
-      removeSparkles(id);
-    } else {
-      wantReturn[id] = true;
-      addSparkles(id, feature);
-    }
-    save(); updateCounter();
-  }
-
+  // ---- ツールチップ ----
   function showTooltip(e, name, data) {
     const lv = getLevel(data);
     const cnt = getCount(data);
@@ -333,24 +528,205 @@
 
   function hideTooltip() { tooltip.style.display = 'none'; }
 
-  function nextLevel(current) {
-    return LEVELS[(LEVELS.indexOf(current) + 1) % LEVELS.length];
+  // ---- パネル ----
+  const panel        = document.getElementById('panel');
+  const panelOverlay = document.getElementById('panel-overlay');
+  const panelTitle   = document.getElementById('panel-title');
+  const panelClose   = document.getElementById('panel-close');
+  const panelCountVal = document.getElementById('panel-count-val');
+  const countMinus   = document.getElementById('count-minus');
+  const countPlus    = document.getElementById('count-plus');
+  const panelReturnBtn = document.getElementById('panel-return-btn');
+  const panelDrillBtn  = document.getElementById('panel-drill-btn');
+  const panelCountSection = document.getElementById('panel-count-section');
+
+  let panelState = { id: null, name: '', isCity: false, feature: null };
+
+  function openPanel(id, name, isCity, feature) {
+    panelState = { id, name, isCity, feature };
+    panelTitle.textContent = name;
+
+    const store = isCity ? visitCity : visitPref;
+    const data  = store[id] || { level: 'none', count: 0 };
+    const lv    = getLevel(data);
+    const cnt   = getCount(data);
+
+    // レベルボタン
+    document.querySelectorAll('.level-btn').forEach(btn => {
+      btn.className = 'level-btn';
+      if (btn.dataset.level === lv) btn.classList.add('active-' + lv);
+    });
+
+    // カウント
+    panelCountVal.textContent = cnt;
+    countMinus.disabled = (cnt <= 0 || lv === 'none');
+    panelCountSection.style.opacity = lv === 'none' ? '0.4' : '1';
+
+    // また行きたい
+    panelReturnBtn.classList.toggle('active', !!wantReturn[id]);
+
+    // 市区町村ボタン（都道府県ビューのみ）
+    panelDrillBtn.style.display = isCity ? 'none' : 'block';
+
+    panelOverlay.classList.add('visible');
+    panel.classList.add('visible');
   }
 
+  function closePanel() {
+    panel.classList.remove('visible');
+    panelOverlay.classList.remove('visible');
+    // 選択状態を解除
+    g.selectAll('.prefecture, .city').classed('selected', false);
+    panelState.id = null;
+  }
+
+  function refreshPanelCount() {
+    if (!panelState.id) return;
+    const store = panelState.isCity ? visitCity : visitPref;
+    const data  = store[panelState.id] || { level: 'none', count: 0 };
+    panelCountVal.textContent = getCount(data);
+    countMinus.disabled = (getCount(data) <= 0 || getLevel(data) === 'none');
+    panelCountSection.style.opacity = getLevel(data) === 'none' ? '0.4' : '1';
+  }
+
+  function syncMapColor(id, isCity) {
+    const store = isCity ? visitCity : visitPref;
+    const data  = store[id];
+    const color = colorForLevel(getLevel(data), getCount(data));
+    const sel   = isCity ? '.city' : '.prefecture';
+    g.selectAll(sel).filter(d => (isCity ? getCityId(d, '') : getPrefId(d)) === id)
+      .each(function(d) {
+        const actualId = isCity ? getCityId(d, '') : getPrefId(d);
+        if (actualId === id) d3.select(this).attr('fill', color);
+      });
+    // 直接 attr で確実に色を更新
+    d3.selectAll(sel).each(function(d) {
+      let did;
+      if (isCity) {
+        // cityIdは prefId が必要だが、パネル内では id に city ID を保存している
+        did = d.properties.N03_007 || d.properties.code || d.properties.id || '';
+        if (String(did) === id) d3.select(this).attr('fill', color);
+      } else {
+        did = getPrefId(d);
+        if (did === id) d3.select(this).attr('fill', color);
+      }
+    });
+  }
+
+  // レベルボタン クリック
+  document.querySelectorAll('.level-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const newLv = btn.dataset.level;
+      const store = panelState.isCity ? visitCity : visitPref;
+      const cur   = store[panelState.id] || { level: 'none', count: 0 };
+
+      if (newLv === 'none') {
+        delete store[panelState.id];
+      } else {
+        store[panelState.id] = { level: newLv, count: Math.max(1, getCount(cur)) };
+      }
+
+      // ボタン状態更新
+      document.querySelectorAll('.level-btn').forEach(b => {
+        b.className = 'level-btn';
+        if (b.dataset.level === newLv) b.classList.add('active-' + newLv);
+      });
+      refreshPanelCount();
+
+      // SVGの色を更新
+      const data  = store[panelState.id];
+      const color = colorForLevel(getLevel(data), getCount(data));
+      g.selectAll(panelState.isCity ? '.city' : '.prefecture')
+        .filter(d => {
+          const did = panelState.isCity
+            ? (d.properties.N03_007 || d.properties.code || d.properties.id || '')
+            : getPrefId(d);
+          return String(did) === panelState.id;
+        })
+        .attr('fill', color);
+
+      save(); updateCounter();
+    });
+  });
+
+  // カウント増減
+  countPlus.addEventListener('click', () => {
+    const store = panelState.isCity ? visitCity : visitPref;
+    const cur   = store[panelState.id];
+    if (!cur || getLevel(cur) === 'none') return;
+    store[panelState.id].count = getCount(cur) + 1;
+    refreshPanelCount();
+
+    const color = colorForLevel(cur.level, cur.count);
+    g.selectAll(panelState.isCity ? '.city' : '.prefecture')
+      .filter(d => {
+        const did = panelState.isCity
+          ? (d.properties.N03_007 || d.properties.code || d.properties.id || '')
+          : getPrefId(d);
+        return String(did) === panelState.id;
+      })
+      .attr('fill', color);
+
+    save(); updateCounter();
+  });
+
+  countMinus.addEventListener('click', () => {
+    const store = panelState.isCity ? visitCity : visitPref;
+    const cur   = store[panelState.id];
+    if (!cur || getCount(cur) <= 1) return;
+    store[panelState.id].count = getCount(cur) - 1;
+    refreshPanelCount();
+
+    const color = colorForLevel(cur.level, cur.count);
+    g.selectAll(panelState.isCity ? '.city' : '.prefecture')
+      .filter(d => {
+        const did = panelState.isCity
+          ? (d.properties.N03_007 || d.properties.code || d.properties.id || '')
+          : getPrefId(d);
+        return String(did) === panelState.id;
+      })
+      .attr('fill', color);
+
+    save(); updateCounter();
+  });
+
+  // また行きたい
+  panelReturnBtn.addEventListener('click', () => {
+    const id = panelState.id;
+    if (wantReturn[id]) {
+      delete wantReturn[id];
+      removeSparkles(id);
+      panelReturnBtn.classList.remove('active');
+    } else {
+      wantReturn[id] = true;
+      if (panelState.feature) addSparkles(id, panelState.feature);
+      panelReturnBtn.classList.add('active');
+    }
+    save(); updateCounter();
+  });
+
+  // 市区町村ボタン
+  panelDrillBtn.addEventListener('click', () => {
+    const feature = panelState.feature;
+    closePanel();
+    if (feature) drillDown(feature);
+  });
+
+  // 閉じる
+  panelClose.addEventListener('click', closePanel);
+  panelOverlay.addEventListener('click', closePanel);
+
   // ---- 都道府県ビュー ----
+  function getPrefId(d) { return String(d.properties.id || d.id || ''); }
+  function getPrefName(d) { return d.properties.nam_ja || d.properties.name || getPrefId(d); }
+
   function renderPrefectures() {
     currentMode = 'pref';
     backBtn.style.display = 'none';
     breadText.textContent = '日本全体';
-    document.getElementById('hint').textContent = '都道府県をクリック → 色を塗る　／　ダブルクリック → 市区町村を表示';
+    document.getElementById('hint').textContent = '地域をクリックするとパネルが開きます';
 
-    // ズームをリセット
-    svg.transition().duration(500).call(
-      d3.zoom().transform,
-      d3.zoomIdentity
-    );
     g.transition().duration(500).attr('transform', '');
-
     g.selectAll('*').remove();
 
     g.selectAll('path')
@@ -368,46 +744,16 @@
       })
       .on('mouseleave', hideTooltip)
       .on('click', (e, d) => {
-        const id = getPrefId(d);
-        const cur = visitPref[id] || { level: 'none', count: 0 };
-        const lv = getLevel(cur);
-        if (lv === 'none') {
-          // 未訪問 → 訪れた1回
-          visitPref[id] = { level: 'visited', count: 1 };
-        } else {
-          // 同じレベルで回数を増やす
-          visitPref[id] = { level: lv, count: getCount(cur) + 1 };
-        }
-        d3.select(e.currentTarget).attr('fill', colorForLevel(visitPref[id].level, visitPref[id].count));
-        save(); updateCounter();
-      })
-      .on('dblclick', (e, d) => {
-        e.stopPropagation();
-        drillDown(d);
-      })
-      .on('contextmenu', (e, d) => {
-        e.preventDefault();
-        const id = getPrefId(d);
-        const cur = visitPref[id] || { level: 'none', count: 0 };
-        const nextLv = nextLevel(getLevel(cur));
-        if (nextLv === 'none') {
-          delete visitPref[id];
-        } else {
-          visitPref[id] = { level: nextLv, count: Math.max(1, getCount(cur)) };
-        }
-        const newData = visitPref[id];
-        d3.select(e.currentTarget).attr('fill', colorForLevel(getLevel(newData), getCount(newData)));
-        save(); updateCounter();
+        hideTooltip();
+        g.selectAll('.prefecture').classed('selected', false);
+        d3.select(e.currentTarget).classed('selected', true);
+        openPanel(getPrefId(d), getPrefName(d), false, d);
       });
 
-    // 保存済みキラキラを復元
     prefFeatures.forEach(d => {
       if (wantReturn[getPrefId(d)]) addSparkles(getPrefId(d), d);
     });
   }
-
-  function getPrefId(d) { return String(d.properties.id || d.id || ''); }
-  function getPrefName(d) { return d.properties.nam_ja || d.properties.name || getPrefId(d); }
 
   // ---- 市区町村ドリルダウン ----
   function drillDown(prefFeature) {
@@ -418,9 +764,8 @@
     loading.style.display = 'inline';
     breadText.textContent = prefName;
     backBtn.style.display = 'inline-block';
-    document.getElementById('hint').textContent = '市区町村をクリック → 色を塗る';
+    document.getElementById('hint').textContent = '市区町村をクリックするとパネルが開きます';
 
-    // 選択した都道府県にズーム
     const bounds = path.bounds(prefFeature);
     const bw = bounds[1][0] - bounds[0][0];
     const bh = bounds[1][1] - bounds[0][1];
@@ -431,7 +776,6 @@
     g.transition().duration(600)
       .attr('transform', `translate(${tx},${ty}) scale(${scale})`);
 
-    // GitHub API でフォルダ内のファイル一覧を取得 → 全ファイルを並列fetch
     fetch(`https://api.github.com/repos/niiyz/JapanCityGeoJson/contents/geojson/${code}`)
       .then(r => { if (!r.ok) throw new Error('API error'); return r.json(); })
       .then(files => {
@@ -442,7 +786,6 @@
         loading.style.display = 'none';
         currentMode = 'city';
 
-        // 全ファイルの features をマージ
         const allFeatures = dataList.flatMap(d => d.features || []);
 
         g.selectAll('.prefecture').attr('opacity', 0.25).style('pointer-events', 'none');
@@ -463,30 +806,10 @@
           })
           .on('mouseleave', hideTooltip)
           .on('click', (e, d) => {
-            const id = getCityId(d, prefId);
-            const cur = visitCity[id] || { level: 'none', count: 0 };
-            const lv = getLevel(cur);
-            if (lv === 'none') {
-              visitCity[id] = { level: 'visited', count: 1 };
-            } else {
-              visitCity[id] = { level: lv, count: getCount(cur) + 1 };
-            }
-            d3.select(e.currentTarget).attr('fill', colorForLevel(visitCity[id].level, visitCity[id].count));
-            save(); updateCounter();
-          })
-          .on('contextmenu', (e, d) => {
-            e.preventDefault();
-            const id = getCityId(d, prefId);
-            const cur = visitCity[id] || { level: 'none', count: 0 };
-            const nextLv = nextLevel(getLevel(cur));
-            if (nextLv === 'none') {
-              delete visitCity[id];
-            } else {
-              visitCity[id] = { level: nextLv, count: Math.max(1, getCount(cur)) };
-            }
-            const newData = visitCity[id];
-            d3.select(e.currentTarget).attr('fill', colorForLevel(getLevel(newData), getCount(newData)));
-            save(); updateCounter();
+            hideTooltip();
+            g.selectAll('.city').classed('selected', false);
+            d3.select(e.currentTarget).classed('selected', true);
+            openPanel(getCityId(d, prefId), getCityName(d), true, d);
           });
       })
       .catch(err => {
@@ -506,6 +829,7 @@
 
   // 戻るボタン
   backBtn.addEventListener('click', () => {
+    closePanel();
     g.selectAll('.city').remove();
     renderPrefectures();
   });
@@ -518,6 +842,7 @@
     g.selectAll('.prefecture').attr('fill', COLORS['none']);
     g.selectAll('.city').attr('fill', COLORS['none']);
     sparkleGroup.selectAll('*').remove();
+    closePanel();
     updateCounter();
   });
 
