@@ -16,11 +16,11 @@
 <body>
 
 <main class="container">
-  <h1>数当てゲーム (1~20)</h1>
-  
+  <h1>数当てゲーム (1~100)</h1>
+
   <div id="guessGame">
     <label for="guessField">予想: </label>
-    <input type="number" min="1" max="20" id="guessField">
+    <input type="number" min="1" max="100" id="guessField">
     <input type="submit" value="予想を入力" id="guessSubmit">
     <input type="button" value="リセット" id="guessReset">
     <p id="guessResult"></p>
@@ -29,7 +29,7 @@
 
 <script>
   // 1から20までのランダムな整数を生成し、コンソールにログを出力
-  let answerNumber = Math.floor(Math.random() * 20) + 1;
+  let answerNumber = Math.floor(Math.random() * 100) + 1;
   console.log('正解は' + answerNumber);
 
   // 数値入力フィールドを取得
@@ -63,7 +63,7 @@
 
   // リセット処理
   function resetGame() {
-    answerNumber = Math.floor(Math.random() * 20) + 1;
+    answerNumber = Math.floor(Math.random() * 100) + 1;
     console.log('正解は' + answerNumber);
     guessField.value = '';
     guessResult.textContent = '';
