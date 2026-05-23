@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <title>日本の名城</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <style>
+    h1 {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 32px;
+    }
+
+    #castle-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .castle-card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    .castle-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .castle-card .card-body {
+      padding: 16px;
+    }
+
+    .castle-card h2 {
+      font-size: 1.1em;
+      margin: 0 0 4px;
+    }
+
+    .castle-card .meta {
+      font-size: 0.82em;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .castle-card .description {
+      font-size: 0.92em;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .castle-card a.map-link {
+      font-size: 0.85em;
+      text-decoration: none;
+      color: #1E88E5;
+    }
+
+    .castle-card a.map-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<main class="container">
+  <h1>日本の名城</h1>
+  <p class="subtitle">歴史と美しさで知られる日本各地の城を紹介します</p>
+
+  <div id="castle-grid"></div>
+</main>
+
+<script>
+  const castles = [
+    {
+      name: '姫路城',
+      location: '兵庫県姫路市',
+      built: '1346年（現存天守は1601年）',
+      description: '白鷺城とも呼ばれる純白の天守が美しい、国宝・世界遺産の名城。',
+      image: 'Himeji.jpg',
+      mapUrl: 'https://maps.google.com/?q=姫路城'
+    },
+    {
+      name: '松本城',
+      location: '長野県松本市',
+      built: '1593年頃',
+      description: '黒と白のコントラストが印象的な天守を持つ国宝城郭。日本最古の五重天守のひとつ。',
+      image: 'Matsumoto.jpeg',
+      mapUrl: 'https://maps.google.com/?q=松本城'
+    },
+    {
+      name: '熊本城',
+      location: '熊本県熊本市',
+      built: '1607年',
+      description: '難攻不落の城として知られ、その堅固な石垣は「武者返し」と呼ばれる。2016年の地震から復旧中。',
+      image: 'Kumamoto.jpg',
+      mapUrl: 'https://maps.google.com/?q=熊本城'
+    },
+    {
+      name: '大阪城',
+      location: '大阪府大阪市',
+      built: '1583年（豊臣秀吉）',
+      description: '豊臣秀吉が築いた天下の名城。現在の天守は1931年に再建され、大阪のシンボルとなっている。',
+      image: 'Osaka.jpeg',
+      mapUrl: 'https://maps.google.com/?q=大阪城'
+    },
+    {
+      name: '彦根城',
+      location: '滋賀県彦根市',
+      built: '1622年',
+      description: '琵琶湖を望む丘に建つ国宝天守。現存12天守のひとつで、繊細な意匠が特徴。',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Hikone_castle_2010.jpg/640px-Hikone_castle_2010.jpg',
+      mapUrl: 'https://maps.google.com/?q=彦根城'
+    },
+    {
+      name: '松江城',
+      location: '島根県松江市',
+      built: '1611年',
+      description: '山陰地方唯一の現存天守で国宝。宍道湖近くに構え、黒い板張りの外観が重厚な印象を与える。',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Matsue_Castle_-_October_2018.jpg/640px-Matsue_Castle_-_October_2018.jpg',
+      mapUrl: 'https://maps.google.com/?q=松江城'
+    },
+  ];
+
+  const grid = document.getElementById('castle-grid');
+
+  castles.forEach(function(castle) {
+    let card = document.createElement('div');
+    card.className = 'castle-card';
+    card.innerHTML = `
+      <img src="${castle.image}" alt="${castle.name}">
+      <div class="card-body">
+        <h2>${castle.name}</h2>
+        <div class="meta">📍 ${castle.location}　🏯 築城: ${castle.built}</div>
+        <p class="description">${castle.description}</p>
+        <a class="map-link" href="${castle.mapUrl}" target="_blank">🗺️ 地図で見る</a>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+</script>
+
+</body>
+</html>
