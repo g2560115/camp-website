@@ -2,10 +2,23 @@
 
   <title>日本の名城</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@700&display=swap" rel="stylesheet">
   <style>
+    main {
+      padding-top: 120px;
+      position: relative;
+      z-index: 1;
+    }
+
     h1 {
       text-align: center;
       margin-bottom: 8px;
+      font-family: 'Kaisei Decol', serif;
+      font-weight: 700;
+      font-size: 3em;
+      letter-spacing: 0.15em;
+      color: #2a1a00;
+      text-shadow: 3px 3px 0 #8B4513, 5px 5px 8px rgba(0,0,0,0.4);
     }
 
     .subtitle {
@@ -26,6 +39,8 @@
       overflow: hidden;
       background: #fff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      position: relative;
+      z-index: 1;
     }
 
     .castle-card img {
@@ -64,9 +79,67 @@
     .castle-card a.map-link:hover {
       text-decoration: underline;
     }
+
+    #top-border, #bottom-border {
+      width: 100%;
+      height: 48px;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          #8B4513 0px, #8B4513 20px,
+          #c8860a 20px, #c8860a 40px,
+          #8B4513 40px, #8B4513 60px,
+          #5a2d0c 60px, #5a2d0c 80px
+        );
+      position: relative;
+      z-index: 2;
+    }
+
+    #top-border {
+      border-bottom: 4px solid #3a1a00;
+    }
+
+    #bottom-border {
+      border-top: 4px solid #3a1a00;
+    }
+
+    #top-border::before, #bottom-border::before {
+      content: '❖ ✦ ❖ ✦ ❖ ✦ ❖ ✦ ❖ ✦ ❖ ✦ ❖ ✦ ❖ ✦ ❖ ✦ ❖ ✦ ❖ ✦ ❖ ✦ ❖ ✦ ❖ ✦ ❖';
+      position: absolute;
+      top: 50%; left: 0; right: 0;
+      transform: translateY(-50%);
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255,220,100,0.7);
+      letter-spacing: 4px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    #shuriken-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .shuriken {
+      position: absolute;
+      top: -60px;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(720deg); }
+    }
   </style>
 </head>
 <body>
+
+<div id="top-border"></div>
+<div id="shuriken-container"></div>
 
 <main class="container">
   <h1>日本の名城</h1>
@@ -74,8 +147,23 @@
 
   <div id="castle-grid"></div>
 </main>
+<div id="bottom-border"></div>
 
 <script>
+  const shurikenContainer = document.getElementById('shuriken-container');
+  for (let i = 0; i < 15; i++) {
+    let img = document.createElement('img');
+    img.src = 'shurikenn.jpeg';
+    img.className = 'shuriken';
+    img.style.left = Math.random() * 100 + 'vw';
+    img.style.animationDuration = (4 + Math.random() * 6) + 's';
+    img.style.animationDelay = (Math.random() * 8) + 's';
+    let size = (30 + Math.random() * 40) + 'px';
+    img.style.width = size;
+    img.style.height = size;
+    shurikenContainer.appendChild(img);
+  }
+
   const castles = [
     {
       name: '姫路城',

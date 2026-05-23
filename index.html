@@ -178,26 +178,6 @@
       color: #006400;
     }
 
-    /* 手裏剣 */
-    #shuriken-container {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 9999;
-    }
-
-    .shuriken {
-      position: absolute;
-      top: -60px;
-      animation: fall linear infinite;
-    }
-
-    @keyframes fall {
-      to { transform: translateY(110vh) rotate(720deg); }
-    }
-
     /* フッター */
     footer {
       background: #006400;
@@ -210,8 +190,6 @@
   </style>
 </head>
 <body>
-
-<div id="shuriken-container"></div>
 
 <header>
   <div class="logo">JE</div>
@@ -251,20 +229,6 @@
 </footer>
 
 <script>
-  const container = document.getElementById('shuriken-container');
-  for (let i = 0; i < 15; i++) {
-    let img = document.createElement('img');
-    img.src = 'shurikenn.jpeg';
-    img.className = 'shuriken';
-    img.style.left = Math.random() * 100 + 'vw';
-    img.style.animationDuration = (4 + Math.random() * 6) + 's';
-    img.style.animationDelay = (Math.random() * 8) + 's';
-    let size = (30 + Math.random() * 40) + 'px';
-    img.style.width = size;
-    img.style.height = size;
-    container.appendChild(img);
-  }
-
   const sites = {
     1: 'pokemon.html',
     2: 'castles.html'
