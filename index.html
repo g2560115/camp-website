@@ -515,6 +515,7 @@
   <a href="pokemon.html">🎮 ポケモンガチャ</a>
   <a href="castles.html">🏯 日本の名城</a>
   <a href="visited.html">🗾 訪問マップ</a>
+  <a href="architecture.html">🏙 日本の有名建築</a>
 </nav>
 
 <!-- 電車アニメーション帯 -->
@@ -587,6 +588,12 @@
         <span class="dep-type">訪問各停</span>
         <span class="dep-track">→ visited.html</span>
       </div>
+      <div class="dep-row">
+        <span class="dep-num">4</span>
+        <span class="dep-dest">日本の有名建築</span>
+        <span class="dep-type">夜景特急</span>
+        <span class="dep-track">→ architecture.html</span>
+      </div>
     </div>
   </div>
 
@@ -622,16 +629,25 @@
           </a>
         </div>
       </div>
+      <div class="route-stop">
+        <div class="stop-circle">4</div>
+        <div class="stop-card">
+          <a href="architecture.html">
+            <span class="stop-ja">🏙 日本の有名建築</span>
+            <span class="stop-en">Architecture of Japan</span>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- 数当てゲーム -->
   <div class="section">
     <h2>🎯 番線ガチャ — どの行き先に乗る？</h2>
-    <p class="guess-desc">1〜3の番線を当てると、その番線のサイトに移動します。</p>
+    <p class="guess-desc">1〜4の番線を当てると、その番線のサイトに移動します。</p>
     <div id="guessGame">
       <label for="guessField">予想:</label>
-      <input type="number" min="1" max="3" id="guessField">
+      <input type="number" min="1" max="4" id="guessField">
       <input type="submit" value="予想を入力" id="guessSubmit">
       <input type="button" value="リセット" id="guessReset">
     </div>
@@ -647,10 +663,11 @@
   const sites = {
     1: 'pokemon.html',
     2: 'castles.html',
-    3: 'visited.html'
+    3: 'visited.html',
+    4: 'architecture.html'
   };
 
-  let answerNumber = Math.floor(Math.random() * 3) + 1;
+  let answerNumber = Math.floor(Math.random() * 4) + 1;
 
   let guessField = document.querySelector('#guessField');
   let guessResult = document.querySelector('#guessResult');
@@ -670,7 +687,7 @@
   });
 
   document.querySelector('#guessReset').addEventListener('click', function() {
-    answerNumber = Math.floor(Math.random() * 3) + 1;
+    answerNumber = Math.floor(Math.random() * 4) + 1;
     guessField.value = '';
     guessResult.textContent = '';
   });

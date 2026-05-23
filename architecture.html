@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>日本の有名建築</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
+      background: #07080f;
+      color: #dde;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 星空背景 */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 40% 8%,  rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 30%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 12%, rgba(255,255,255,0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 82% 22%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 5%,  rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 15% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 55%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 35% 70%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(2px 2px at 78% 48%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(2px 2px at 5%  80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        linear-gradient(180deg, #07080f 0%, #0d1020 60%, #151830 100%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* CSSスカイライン */
+    .skyline {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      height: 160px;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .skyline svg {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ヘッダー */
+    header {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 60px 20px 40px;
+    }
+
+    .header-label {
+      font-size: 0.7em;
+      letter-spacing: 6px;
+      color: #6688aa;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 2.8em;
+      font-weight: 700;
+      color: white;
+      letter-spacing: 0.15em;
+      line-height: 1.2;
+      text-shadow: 0 0 40px rgba(80,160,255,0.4), 0 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .header-sub {
+      font-size: 0.78em;
+      color: #6688aa;
+      letter-spacing: 3px;
+      margin-top: 10px;
+    }
+
+    /* 光る水平線 */
+    .glow-line {
+      width: 120px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #4488ff, transparent);
+      margin: 20px auto 0;
+    }
+
+    /* グリッド */
+    main {
+      position: relative;
+      z-index: 10;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px 200px;
+    }
+
+    #arch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 28px;
+    }
+
+    /* カード */
+    .arch-card {
+      background: rgba(12, 16, 30, 0.85);
+      border: 1px solid rgba(60, 100, 180, 0.3);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      backdrop-filter: blur(4px);
+    }
+
+    .arch-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 4px;
+      box-shadow: inset 0 0 0 1px rgba(80,140,255,0.1);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .arch-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(80, 160, 255, 0.6);
+      box-shadow: 0 12px 40px rgba(40, 80, 200, 0.3), 0 0 20px rgba(40,80,200,0.1);
+    }
+
+    .card-img-wrap {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+      background: #0d1428;
+    }
+
+    .arch-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.85) saturate(0.9);
+      transition: filter 0.3s, transform 0.3s;
+    }
+
+    .arch-card:hover img {
+      filter: brightness(1) saturate(1.1);
+      transform: scale(1.03);
+    }
+
+    /* 年代タグ */
+    .card-year {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.75);
+      border: 1px solid rgba(80,140,255,0.4);
+      color: #88aaff;
+      font-size: 0.68em;
+      padding: 3px 8px;
+      border-radius: 2px;
+      letter-spacing: 1px;
+      z-index: 3;
+    }
+
+    /* 光るボトムライン */
+    .card-glow-bottom {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #4488ff, transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .arch-card:hover .card-glow-bottom { opacity: 1; }
+
+    .card-body {
+      padding: 18px 20px 20px;
+    }
+
+    .card-name {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #eef2ff;
+      margin-bottom: 2px;
+      letter-spacing: 1px;
+    }
+
+    .card-name-en {
+      font-size: 0.68em;
+      color: #4488aa;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      font-size: 0.72em;
+      color: #6688aa;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-desc {
+      font-size: 0.82em;
+      color: #99aacc;
+      line-height: 1.8;
+      margin-bottom: 14px;
+    }
+
+    .card-link {
+      font-size: 0.75em;
+      color: #4488ff;
+      text-decoration: none;
+      letter-spacing: 1px;
+      border-bottom: 1px solid rgba(68,136,255,0.3);
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .card-link:hover {
+      color: #88bbff;
+      border-color: rgba(136,187,255,0.6);
+    }
+
+    /* ナビ */
+    nav {
+      position: relative;
+      z-index: 10;
+      background: rgba(10,14,26,0.9);
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      border-bottom: 1px solid rgba(60,100,180,0.3);
+      backdrop-filter: blur(8px);
+    }
+
+    nav a {
+      color: #99aacc;
+      text-decoration: none;
+      font-size: 0.82em;
+      padding: 10px 20px;
+      border-right: 1px solid rgba(60,100,180,0.2);
+      white-space: nowrap;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    nav a:hover { color: white; background: rgba(40,80,160,0.2); }
+  </style>
+</head>
+<body>
+
+<!-- CSSスカイライン -->
+<div class="skyline">
+  <svg viewBox="0 0 1440 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- ビル群シルエット -->
+    <g fill="#0d1020" opacity="0.95">
+      <!-- 左エリア -->
+      <rect x="0"   y="100" width="40"  height="60"/>
+      <rect x="10"  y="80"  width="20"  height="80"/>
+      <rect x="50"  y="110" width="35"  height="50"/>
+      <rect x="60"  y="90"  width="15"  height="70"/>
+      <rect x="90"  y="70"  width="30"  height="90"/>
+      <rect x="95"  y="50"  width="8"   height="110"/>
+      <rect x="125" y="95"  width="40"  height="65"/>
+      <rect x="130" y="75"  width="12"  height="85"/>
+      <rect x="170" y="85"  width="35"  height="75"/>
+      <rect x="180" y="60"  width="10"  height="100"/>
+      <rect x="210" y="100" width="30"  height="60"/>
+      <rect x="245" y="75"  width="45"  height="85"/>
+      <rect x="260" y="45"  width="12"  height="115"/>
+      <rect x="295" y="90"  width="35"  height="70"/>
+      <rect x="300" y="65"  width="8"   height="95"/>
+      <!-- 中央エリア -->
+      <rect x="340" y="80"  width="50"  height="80"/>
+      <rect x="355" y="50"  width="15"  height="110"/>
+      <rect x="395" y="95"  width="40"  height="65"/>
+      <rect x="440" y="70"  width="45"  height="90"/>
+      <rect x="450" y="40"  width="10"  height="120"/>
+      <rect x="453" y="25"  width="4"   height="15"/>
+      <rect x="490" y="85"  width="35"  height="75"/>
+      <rect x="530" y="75"  width="50"  height="85"/>
+      <rect x="550" y="55"  width="8"   height="105"/>
+      <rect x="585" y="90"  width="40"  height="70"/>
+      <rect x="630" y="65"  width="55"  height="95"/>
+      <rect x="650" y="35"  width="12"  height="125"/>
+      <rect x="654" y="15"  width="4"   height="20"/>
+      <rect x="690" y="85"  width="35"  height="75"/>
+      <!-- 右エリア -->
+      <rect x="730" y="80"  width="45"  height="80"/>
+      <rect x="745" y="55"  width="10"  height="105"/>
+      <rect x="780" y="95"  width="40"  height="65"/>
+      <rect x="825" y="70"  width="50"  height="90"/>
+      <rect x="840" y="45"  width="8"   height="115"/>
+      <rect x="880" y="85"  width="35"  height="75"/>
+      <rect x="920" y="75"  width="45"  height="85"/>
+      <rect x="930" y="50"  width="12"  height="110"/>
+      <rect x="970" y="90"  width="40"  height="70"/>
+      <rect x="1015" y="65" width="55"  height="95"/>
+      <rect x="1030" y="30" width="14"  height="130"/>
+      <rect x="1034" y="10" width="6"   height="22"/>
+      <rect x="1075" y="85" width="35"  height="75"/>
+      <rect x="1115" y="80" width="50"  height="80"/>
+      <rect x="1130" y="55" width="10"  height="105"/>
+      <rect x="1170" y="95" width="40"  height="65"/>
+      <rect x="1215" y="70" width="45"  height="90"/>
+      <rect x="1225" y="45" width="8"   height="115"/>
+      <rect x="1265" y="85" width="35"  height="75"/>
+      <rect x="1305" y="75" width="50"  height="85"/>
+      <rect x="1320" y="50" width="12"  height="110"/>
+      <rect x="1360" y="90" width="40"  height="70"/>
+      <rect x="1400" y="80" width="40"  height="80"/>
+    </g>
+    <!-- 窓の光 -->
+    <g fill="rgba(255,220,100,0.25)">
+      <rect x="15"  y="83"  width="4" height="3"/>
+      <rect x="22"  y="83"  width="4" height="3"/>
+      <rect x="15"  y="90"  width="4" height="3"/>
+      <rect x="96"  y="54"  width="3" height="3"/>
+      <rect x="96"  y="62"  width="3" height="3"/>
+      <rect x="135" y="78"  width="4" height="3"/>
+      <rect x="143" y="78"  width="4" height="3"/>
+      <rect x="183" y="63"  width="3" height="3"/>
+      <rect x="263" y="48"  width="4" height="3"/>
+      <rect x="263" y="58"  width="4" height="3"/>
+      <rect x="356" y="53"  width="5" height="4"/>
+      <rect x="356" y="63"  width="5" height="4"/>
+      <rect x="364" y="53"  width="5" height="4"/>
+      <rect x="451" y="43"  width="4" height="4"/>
+      <rect x="458" y="43"  width="4" height="4"/>
+      <rect x="451" y="53"  width="4" height="4"/>
+      <rect x="553" y="58"  width="3" height="3"/>
+      <rect x="553" y="66"  width="3" height="3"/>
+      <rect x="651" y="38"  width="4" height="4"/>
+      <rect x="651" y="48"  width="4" height="4"/>
+      <rect x="658" y="38"  width="4" height="4"/>
+      <rect x="746" y="58"  width="4" height="4"/>
+      <rect x="753" y="58"  width="4" height="4"/>
+      <rect x="841" y="48"  width="3" height="3"/>
+      <rect x="931" y="53"  width="4" height="4"/>
+      <rect x="940" y="53"  width="4" height="4"/>
+      <rect x="1031" y="33" width="5" height="4"/>
+      <rect x="1031" y="43" width="5" height="4"/>
+      <rect x="1040" y="33" width="5" height="4"/>
+      <rect x="1131" y="58" width="4" height="4"/>
+      <rect x="1226" y="48" width="3" height="3"/>
+      <rect x="1321" y="53" width="4" height="4"/>
+    </g>
+    <!-- 地面ライン -->
+    <rect x="0" y="158" width="1440" height="2" fill="rgba(40,80,180,0.4)"/>
+  </svg>
+</div>
+
+<nav>
+  <a href="index.html">🚉 トップ</a>
+  <a href="pokemon.html">🎮 ポケモンガチャ</a>
+  <a href="castles.html">🏯 日本の名城</a>
+  <a href="visited.html">🗾 訪問マップ</a>
+  <a href="architecture.html">🏙 日本の有名建築</a>
+</nav>
+
+<header>
+  <div class="header-label">ARCHITECTURE OF JAPAN</div>
+  <h1>日本の有名建築</h1>
+  <div class="header-sub">近現代建築の傑作たち</div>
+  <div class="glow-line"></div>
+</header>
+
+<main>
+  <div id="arch-grid"></div>
+</main>
+
+<script>
+  const buildings = [
+    {
+      name: '東京スカイツリー',
+      nameEn: 'Tokyo Skytree',
+      year: '2012',
+      location: '東京都墨田区',
+      architect: '日建設計',
+      height: '634m',
+      description: '世界第2位の高さを誇る電波塔。日本の伝統美と最新技術を融合した独自のシルエットが特徴。',
+      image: 'skytree.jpg',
+      mapUrl: 'https://maps.google.com/?q=東京スカイツリー'
+    },
+    {
+      name: '東京タワー',
+      nameEn: 'Tokyo Tower',
+      year: '1958',
+      location: '東京都港区',
+      architect: '内藤多仲',
+      height: '333m',
+      description: '戦後復興の象徴として建設された電波塔。エッフェル塔をモデルに、日本の技術で独自の発展を遂げた。',
+      image: 'tokyotower.jpg',
+      mapUrl: 'https://maps.google.com/?q=東京タワー'
+    },
+    {
+      name: '国立競技場',
+      nameEn: 'Japan National Stadium',
+      year: '2019',
+      location: '東京都新宿区',
+      architect: '隈研吾',
+      height: '—',
+      description: '木と緑を組み合わせた「杜のスタジアム」。日本の伝統的な軒庇と木材を活かした隈研吾の代表作。',
+      image: 'stadium.jpg',
+      mapUrl: 'https://maps.google.com/?q=国立競技場'
+    },
+    {
+      name: '東京国際フォーラム',
+      nameEn: 'Tokyo International Forum',
+      year: '1997',
+      location: '東京都千代田区',
+      architect: 'ラファエル・ヴィニオリ',
+      height: '—',
+      description: '巨大なガラス張りの船形ホールが圧倒的な存在感を放つ複合文化施設。内部の透明感ある構造美が見どころ。',
+      image: 'forum.jpg',
+      mapUrl: 'https://maps.google.com/?q=東京国際フォーラム'
+    },
+    {
+      name: 'あべのハルカス',
+      nameEn: 'Abeno Harukas',
+      year: '2014',
+      location: '大阪府大阪市阿倍野区',
+      architect: '日建設計',
+      height: '300m',
+      description: '高さ300mの日本一の超高層ビル（当時）。大阪随一の展望台「ハルカス300」から360度の絶景を望める。',
+      image: 'harukas.jpg',
+      mapUrl: 'https://maps.google.com/?q=あべのハルカス'
+    },
+    {
+      name: '六本木ヒルズ森タワー',
+      nameEn: 'Roppongi Hills Mori Tower',
+      year: '2003',
+      location: '東京都港区六本木',
+      architect: 'KPF（コーン・ペダーセン・フォックス）',
+      height: '238m',
+      description: '複合都市開発の先駆けとなった超高層タワー。頂上の東京シティビューと屋外展望台から夜景が楽しめる。',
+      image: 'roppongi.jpg',
+      mapUrl: 'https://maps.google.com/?q=六本木ヒルズ'
+    },
+  ];
+
+  const grid = document.getElementById('arch-grid');
+
+  buildings.forEach(function(b) {
+    const card = document.createElement('div');
+    card.className = 'arch-card';
+    card.innerHTML = `
+      <div class="card-img-wrap">
+        <img src="${b.image}" alt="${b.name}">
+        <div class="card-year">${b.year}</div>
+        <div class="card-glow-bottom"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">${b.name}</div>
+        <div class="card-name-en">${b.nameEn}</div>
+        <div class="card-meta">
+          <span class="meta-item">📍 ${b.location}</span>
+          ${b.height !== '—' ? `<span class="meta-item">↑ ${b.height}</span>` : ''}
+        </div>
+        <div class="card-meta">
+          <span class="meta-item">🏗 ${b.architect}</span>
+        </div>
+        <p class="card-desc">${b.description}</p>
+        <a class="card-link" href="${b.mapUrl}" target="_blank">🗺 地図で見る →</a>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+</script>
+
+</body>
+</html>
