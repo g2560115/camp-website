@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>訪問マップ</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #16213e;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #0f3460;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    header h1 {
+      font-size: 1.3em;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #e0e0ff;
+    }
+
+    #counter {
+      font-size: 0.9em;
+      color: #aaa;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .count-item span {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    .count-lived  span { color: #e05c5c; }
+    .count-stayed span { color: #e0a030; }
+    .count-passed span { color: #60b060; }
+
+    /* 凡例 */
+    #legend {
+      display: flex;
+      gap: 8px;
+      padding: 12px 24px;
+      background: #16213e;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 0.82em;
+    }
+
+    #legend span { color: #aaa; margin-right: 4px; }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 2px solid transparent;
+      transition: border-color 0.15s;
+    }
+
+    .legend-item:hover { border-color: rgba(255,255,255,0.3); }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* ヒントテキスト */
+    #hint {
+      text-align: center;
+      font-size: 0.78em;
+      color: #666;
+      padding: 6px;
+      background: #16213e;
+    }
+
+    /* 地図エリア */
+    #map-container {
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    svg {
+      max-width: 100%;
+    }
+
+    .prefecture {
+      stroke: #334;
+      stroke-width: 0.5;
+      cursor: pointer;
+      transition: filter 0.1s;
+    }
+
+    .prefecture:hover {
+      filter: brightness(1.3);
+      stroke: white;
+      stroke-width: 1;
+    }
+
+    /* ツールチップ */
+    #tooltip {
+      position: fixed;
+      background: rgba(0,0,0,0.85);
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.85em;
+      pointer-events: none;
+      display: none;
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    /* リセットボタン */
+    #reset-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #0f3460;
+      color: #aaa;
+      border: 1px solid #334;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8em;
+      transition: background 0.15s;
+    }
+
+    #reset-btn:hover { background: #e05c5c; color: white; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🗾 訪問マップ</h1>
+  <div id="counter">
+    <div class="count-item count-lived">住んだ: <span id="c-lived">0</span>県</div>
+    <div class="count-item count-stayed">泊まった: <span id="c-stayed">0</span>県</div>
+    <div class="count-item count-passed">通過: <span id="c-passed">0</span>県</div>
+    <div class="count-item" style="color:#aaa">合計: <span id="c-total" style="color:white;font-weight:bold;font-size:1.2em">0</span> / 47県</div>
+  </div>
+</header>
+
+<div id="legend">
+  <span>クリックで切り替え →</span>
+  <div class="legend-item"><div class="legend-color" style="background:#2a2a4a"></div>未訪問</div>
+  <div class="legend-item"><div class="legend-color" style="background:#60b060"></div>通過した</div>
+  <div class="legend-item"><div class="legend-color" style="background:#e0a030"></div>泊まった</div>
+  <div class="legend-item"><div class="legend-color" style="background:#e05c5c"></div>住んだ</div>
+</div>
+
+<div id="hint">都道府県をクリックするたびに「通過→泊まった→住んだ→未訪問」と切り替わります</div>
+
+<div id="map-container">
+  <svg id="japan-map" width="700" height="750"></svg>
+</div>
+
+<div id="tooltip"></div>
+<button id="reset-btn">全リセット</button>
+
+<script>
+  const LEVELS = ['none', 'passed', 'stayed', 'lived'];
+  const COLORS = {
+    none:   '#2a2a4a',
+    passed: '#60b060',
+    stayed: '#e0a030',
+    lived:  '#e05c5c'
+  };
+  const LABELS = {
+    none:   '未訪問',
+    passed: '通過した',
+    stayed: '泊まった',
+    lived:  '住んだ'
+  };
+
+  // localStorage から読み込み
+  let visitData = JSON.parse(localStorage.getItem('visitData') || '{}');
+
+  function save() {
+    localStorage.setItem('visitData', JSON.stringify(visitData));
+  }
+
+  function updateCounter() {
+    let lived = 0, stayed = 0, passed = 0;
+    Object.values(visitData).forEach(function(v) {
+      if (v === 'lived')  lived++;
+      if (v === 'stayed') stayed++;
+      if (v === 'passed') passed++;
+    });
+    document.getElementById('c-lived').textContent  = lived;
+    document.getElementById('c-stayed').textContent = stayed;
+    document.getElementById('c-passed').textContent = passed;
+    document.getElementById('c-total').textContent  = lived + stayed + passed;
+  }
+
+  const tooltip = document.getElementById('tooltip');
+
+  // TopoJSON を fetch して地図を描画
+  fetch('https://raw.githubusercontent.com/dataofjapan/land/master/japan.topojson')
+    .then(r => r.json())
+    .then(function(japan) {
+      const svg = d3.select('#japan-map');
+      const width = 700, height = 750;
+
+      const projection = d3.geoMercator()
+        .center([137, 35.5])
+        .scale(1400)
+        .translate([width / 2, height / 2]);
+
+      const path = d3.geoPath().projection(projection);
+      const features = topojson.feature(japan, japan.objects.japan).features;
+
+      svg.selectAll('path')
+        .data(features)
+        .enter()
+        .append('path')
+        .attr('class', 'prefecture')
+        .attr('d', path)
+        .attr('fill', function(d) {
+          const id = String(d.properties.id || d.id);
+          return COLORS[visitData[id] || 'none'];
+        })
+        .on('mousemove', function(event, d) {
+          const id = String(d.properties.id || d.id);
+          const name = d.properties.nam_ja || d.properties.name || id;
+          const level = LABELS[visitData[id] || 'none'];
+          tooltip.style.display = 'block';
+          tooltip.style.left = (event.clientX + 12) + 'px';
+          tooltip.style.top  = (event.clientY - 30) + 'px';
+          tooltip.textContent = name + '：' + level;
+        })
+        .on('mouseleave', function() {
+          tooltip.style.display = 'none';
+        })
+        .on('click', function(event, d) {
+          const id = String(d.properties.id || d.id);
+          const current = visitData[id] || 'none';
+          const next = LEVELS[(LEVELS.indexOf(current) + 1) % LEVELS.length];
+          if (next === 'none') {
+            delete visitData[id];
+          } else {
+            visitData[id] = next;
+          }
+          d3.select(this).attr('fill', COLORS[next]);
+          save();
+          updateCounter();
+        });
+
+      updateCounter();
+    });
+
+  document.getElementById('reset-btn').addEventListener('click', function() {
+    if (!confirm('全データをリセットしますか？')) return;
+    visitData = {};
+    save();
+    d3.selectAll('.prefecture').attr('fill', COLORS['none']);
+    updateCounter();
+  });
+</script>
+
+</body>
+</html>
