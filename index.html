@@ -4,97 +4,296 @@
   <title>Example Website</title>
   <meta charset="UTF-8">
   <style>
-    h1 {
-      color: grey;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+      background: #f5f5f5;
+      color: #222;
     }
-    a {
+
+    /* ヘッダー */
+    header {
+      background: #006400;
+      color: white;
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    header .logo {
+      font-size: 1.5em;
+      font-weight: 900;
+      letter-spacing: 2px;
+      border: 3px solid white;
+      padding: 2px 10px;
+      border-radius: 2px;
+    }
+
+    header .tagline {
+      font-size: 0.75em;
+      opacity: 0.85;
+      letter-spacing: 1px;
+    }
+
+    /* ナビバー */
+    nav {
+      background: #004d00;
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 0.82em;
+      padding: 10px 20px;
+      border-right: 1px solid rgba(255,255,255,0.15);
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    nav a:hover { background: #006400; }
+
+    /* メインコンテンツ */
+    main {
+      max-width: 860px;
+      margin: 32px auto;
+      padding: 0 16px;
+    }
+
+    /* セクション */
+    .section {
+      background: white;
+      border-top: 4px solid #006400;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+
+    .section h2 {
+      font-size: 1em;
+      color: #006400;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e0e0e0;
+      letter-spacing: 1px;
+    }
+
+    /* サイト一覧 */
+    .site-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .site-list li a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #222;
+      padding: 12px 16px;
+      background: #f9f9f9;
+      border-left: 4px solid #006400;
+      transition: background 0.15s;
+      font-size: 0.95em;
+    }
+
+    .site-list li a:hover { background: #e8f5e8; }
+
+    .site-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: #006400;
+      color: white;
+      border-radius: 50%;
       font-weight: bold;
+      font-size: 0.85em;
+      flex-shrink: 0;
     }
-  </style>
-</head>
-<body>
 
-<h1>Example Website</h1>
-<p>これはウェブサイトです。</p>
+    /* 数当てゲーム */
+    .guess-desc {
+      font-size: 0.88em;
+      color: #555;
+      margin-bottom: 16px;
+      line-height: 1.8;
+    }
 
-<ul>
-  <li><a href="https://www.google.com/">Google</a></li>
-  <li><a href="https://www.yahoo.co.jp/">Yahoo! JAPAN</a></li>
-</ul>
-
-<img src="computer10_heart.png" alt="笑顔のコンピューター">
-
-</body>
-<head>
-  <title>数当てゲーム</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" >
-  <style>
     #guessGame {
-      margin: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
-    #guessGame input {
-      width: 200px;
+    #guessGame label {
+      font-size: 0.88em;
+      color: #444;
+    }
+
+    #guessField {
+      width: 80px;
+      padding: 6px 10px;
+      border: 1px solid #bbb;
+      font-size: 0.95em;
+    }
+
+    #guessSubmit, #guessReset {
+      padding: 7px 16px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85em;
+      font-weight: bold;
+      border-radius: 2px;
+    }
+
+    #guessSubmit {
+      background: #006400;
+      color: white;
+    }
+
+    #guessSubmit:hover { background: #004d00; }
+
+    #guessReset {
+      background: #e0e0e0;
+      color: #444;
+    }
+
+    #guessReset:hover { background: #ccc; }
+
+    #guessResult {
+      margin-top: 12px;
+      font-size: 0.9em;
+      font-weight: bold;
+      color: #006400;
+    }
+
+    /* 手裏剣 */
+    #shuriken-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 9999;
+    }
+
+    .shuriken {
+      position: absolute;
+      top: -60px;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(720deg); }
+    }
+
+    /* フッター */
+    footer {
+      background: #006400;
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      padding: 16px;
+      font-size: 0.75em;
+      margin-top: 48px;
     }
   </style>
 </head>
 <body>
 
-<main class="container">
-  <h1>数当てゲーム (1~100)</h1>
+<div id="shuriken-container"></div>
 
-  <div id="guessGame">
-    <label for="guessField">予想: </label>
-    <input type="number" min="1" max="100" id="guessField">
-    <input type="submit" value="予想を入力" id="guessSubmit">
-    <input type="button" value="リセット" id="guessReset">
+<header>
+  <div class="logo">JE</div>
+  <div class="tagline">Example Website — Moving forward with you</div>
+</header>
+
+<nav>
+  <a href="index.html">トップ</a>
+  <a href="pokemon.html">ポケモンガチャ</a>
+  <a href="castles.html">日本の名城</a>
+</nav>
+
+<main>
+  <div class="section">
+    <h2>サイト一覧</h2>
+    <ul class="site-list">
+      <li><a href="pokemon.html"><span class="site-num">1</span>ポケモンガチャ</a></li>
+      <li><a href="castles.html"><span class="site-num">2</span>日本の名城</a></li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>数当てゲームでサイトを開こう！</h2>
+    <p class="guess-desc">1〜2の数字を当てると、その番号のサイトに移動します。</p>
+    <div id="guessGame">
+      <label for="guessField">予想:</label>
+      <input type="number" min="1" max="2" id="guessField">
+      <input type="submit" value="予想を入力" id="guessSubmit">
+      <input type="button" value="リセット" id="guessReset">
+    </div>
     <p id="guessResult"></p>
   </div>
 </main>
 
+<footer>
+  &copy; 2026 Example Website
+</footer>
+
 <script>
-  // 1から20までのランダムな整数を生成し、コンソールにログを出力
-  let answerNumber = Math.floor(Math.random() * 100) + 1;
-  console.log('正解は' + answerNumber);
+  const container = document.getElementById('shuriken-container');
+  for (let i = 0; i < 15; i++) {
+    let img = document.createElement('img');
+    img.src = 'shurikenn.jpeg';
+    img.className = 'shuriken';
+    img.style.left = Math.random() * 100 + 'vw';
+    img.style.animationDuration = (4 + Math.random() * 6) + 's';
+    img.style.animationDelay = (Math.random() * 8) + 's';
+    let size = (30 + Math.random() * 40) + 'px';
+    img.style.width = size;
+    img.style.height = size;
+    container.appendChild(img);
+  }
 
-  // 数値入力フィールドを取得
+  const sites = {
+    1: 'pokemon.html',
+    2: 'castles.html'
+  };
+
+  let answerNumber = Math.floor(Math.random() * 2) + 1;
+
   let guessField = document.querySelector('#guessField');
-
-  // submitボタンを取得
-  let guessSubmit = document.querySelector('#guessSubmit');
-
-  // 結果を表示する要素を取得
   let guessResult = document.querySelector('#guessResult');
 
-  // ユーザーの入力をチェックし、結果を表示
-  function checkGuess() {
-    // ユーザの入力した値を取得
+  document.querySelector('#guessSubmit').addEventListener('click', function() {
     let userGuess = Number(guessField.value);
-
-    if (userGuess === answerNumber) { // ユーザの入力が正解
-      guessResult.textContent = '正解です！';
-    } else if (userGuess < answerNumber) { // ユーザの入力が正解より小さい
+    if (userGuess === answerNumber) {
+      guessResult.textContent = '正解！' + answerNumber + '番のサイトに移動します...';
+      setTimeout(function() {
+        window.location.href = sites[answerNumber];
+      }, 1200);
+    } else if (userGuess < answerNumber) {
       guessResult.textContent = 'もっと大きいです';
-    } else if (userGuess > answerNumber) { // ユーザの入力が正解より大きい
+    } else {
       guessResult.textContent = 'もっと小さいです';
     }
-  }
+  });
 
-  // submitがクリックされたときに、checkGuess関数を呼び出す
-  guessSubmit.addEventListener('click', checkGuess);
-
-  // リセットボタンを取得
-  let guessReset = document.querySelector('#guessReset');
-
-  // リセット処理
-  function resetGame() {
-    answerNumber = Math.floor(Math.random() * 100) + 1;
-    console.log('正解は' + answerNumber);
+  document.querySelector('#guessReset').addEventListener('click', function() {
+    answerNumber = Math.floor(Math.random() * 2) + 1;
     guessField.value = '';
     guessResult.textContent = '';
-  }
-
-  guessReset.addEventListener('click', resetGame);
+  });
 </script>
 
 </body>
