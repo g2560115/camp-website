@@ -8,34 +8,90 @@
 
     body {
       font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
-      background: #f5f5f5;
+      background: #eef2ee;
       color: #222;
     }
 
-    /* ヘッダー */
+    /* 駅名標ヘッダー */
     header {
       background: #006400;
-      color: white;
-      padding: 0 32px;
-      height: 64px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
+
+    .station-sign {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 5px solid #f0c020;
+    }
+
+    .neighbor {
+      flex: 1;
       display: flex;
       align-items: center;
-      gap: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-
-    header .logo {
-      font-size: 1.5em;
-      font-weight: 900;
-      letter-spacing: 2px;
-      border: 3px solid white;
-      padding: 2px 10px;
-      border-radius: 2px;
-    }
-
-    header .tagline {
+      padding: 10px 20px;
+      color: rgba(255,255,255,0.75);
       font-size: 0.75em;
-      opacity: 0.85;
+      gap: 6px;
+      background: #005200;
+    }
+
+    .neighbor.left  { justify-content: flex-end; border-right: 2px solid rgba(255,255,255,0.25); }
+    .neighbor.right { justify-content: flex-start; border-left: 2px solid rgba(255,255,255,0.25); }
+
+    .neighbor-arrow { font-size: 1.2em; color: rgba(255,255,255,0.5); }
+
+    .station-main {
+      flex: 0 0 auto;
+      background: #006400;
+      padding: 12px 48px;
+      text-align: center;
+      border-left: 3px solid rgba(255,255,255,0.3);
+      border-right: 3px solid rgba(255,255,255,0.3);
+    }
+
+    .station-reading {
+      font-size: 0.68em;
+      color: rgba(255,255,255,0.8);
+      letter-spacing: 5px;
+      margin-bottom: 2px;
+    }
+
+    .station-name {
+      font-size: 2.4em;
+      font-weight: 900;
+      color: white;
+      letter-spacing: 6px;
+    }
+
+    .station-en {
+      font-size: 0.62em;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 3px;
+      margin-top: 2px;
+    }
+
+    /* 路線バー */
+    .line-bar {
+      background: #004d00;
+      padding: 5px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .line-badge {
+      background: #3aaa3a;
+      color: white;
+      font-size: 0.7em;
+      font-weight: bold;
+      padding: 2px 10px;
+      border-radius: 3px;
+      letter-spacing: 1px;
+    }
+
+    .line-info {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.7em;
       letter-spacing: 1px;
     }
 
@@ -45,6 +101,7 @@
       display: flex;
       gap: 0;
       overflow-x: auto;
+      border-bottom: 3px solid #f0c020;
     }
 
     nav a {
@@ -59,10 +116,171 @@
 
     nav a:hover { background: #006400; }
 
-    /* メインコンテンツ */
+    /* 電車アニメーション帯 */
+    .train-band {
+      background: #d8e8d8;
+      border-top: 2px solid #b8d0b8;
+      border-bottom: 2px solid #b8d0b8;
+      height: 64px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* レール */
+    .track {
+      position: absolute;
+      bottom: 8px;
+      left: 0; right: 0;
+      height: 4px;
+      background: #888;
+    }
+
+    .track::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 0; right: 0;
+      height: 2px;
+      background: #888;
+    }
+
+    /* まくら木 */
+    .track::after {
+      content: '';
+      position: absolute;
+      top: -10px; bottom: -4px; left: 0; right: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent 0px, transparent 18px,
+        #a0785a 18px, #a0785a 28px
+      );
+      z-index: -1;
+    }
+
+    /* CSS電車 */
+    .train {
+      position: absolute;
+      bottom: 12px;
+      display: flex;
+      align-items: flex-end;
+      animation: trainRun 14s linear infinite;
+    }
+
+    @keyframes trainRun {
+      0%   { left: -400px; }
+      100% { left: 110%; }
+    }
+
+    .car {
+      position: relative;
+      display: inline-block;
+    }
+
+    /* 車体 */
+    .car-body {
+      width: 90px;
+      height: 36px;
+      background: linear-gradient(180deg, #f5f9ff 0%, #ddeeff 55%, #c0d8f0 100%);
+      border: 2px solid #7799bb;
+      border-bottom: 3px solid #5588aa;
+      position: relative;
+    }
+
+    /* 帯（緑） */
+    .car-body::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      top: 40%;
+      height: 7px;
+      background: #006400;
+    }
+
+    /* 先頭車両のノーズ */
+    .car-head .car-body {
+      border-radius: 14px 2px 0 0;
+      margin-left: 0;
+    }
+
+    .car-nose {
+      width: 28px;
+      height: 36px;
+      background: linear-gradient(180deg, #e8f4ff 0%, #c8dcf0 55%, #b0ccee 100%);
+      border: 2px solid #7799bb;
+      border-right: none;
+      border-bottom: 3px solid #5588aa;
+      border-radius: 14px 0 0 0;
+      clip-path: polygon(0 40%, 100% 0%, 100% 100%, 0 100%);
+      position: relative;
+    }
+
+    .car-nose::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%;
+      height: 7px;
+      background: #006400;
+    }
+
+    /* ライト */
+    .car-light {
+      position: absolute;
+      left: 2px;
+      top: 6px;
+      width: 8px;
+      height: 5px;
+      background: #ffe87c;
+      border-radius: 1px;
+      box-shadow: 0 0 4px #ffe87c;
+    }
+
+    /* 窓 */
+    .car-windows {
+      position: absolute;
+      top: 5px;
+      left: 6px; right: 6px;
+      display: flex;
+      gap: 5px;
+    }
+
+    .win {
+      flex: 1;
+      height: 14px;
+      background: #a8ccee;
+      border: 1px solid #88aabb;
+      border-radius: 1px;
+    }
+
+    /* 車輪 */
+    .car-wheels {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 10px;
+      margin-top: 1px;
+    }
+
+    .wheel {
+      width: 14px;
+      height: 14px;
+      background: radial-gradient(circle at 40% 35%, #777, #333);
+      border-radius: 50%;
+      border: 2px solid #222;
+    }
+
+    /* 連結器 */
+    .coupler {
+      width: 6px;
+      height: 8px;
+      background: #777;
+      border: 1px solid #555;
+      margin: 0 auto 14px;
+    }
+
+    /* メイン */
     main {
       max-width: 860px;
-      margin: 32px auto;
+      margin: 28px auto;
       padding: 0 16px;
     }
 
@@ -84,41 +302,124 @@
       letter-spacing: 1px;
     }
 
-    /* サイト一覧 */
-    .site-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    /* 路線図スタイル サイト一覧 */
+    .route-map {
+      position: relative;
+      padding: 4px 0;
     }
 
-    .site-list li a {
+    .route-rail {
+      position: absolute;
+      left: 19px;
+      top: 0; bottom: 0;
+      width: 6px;
+      background: #006400;
+      z-index: 0;
+    }
+
+    .route-stop {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .route-stop:last-child { margin-bottom: 0; }
+
+    .stop-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: white;
+      border: 4px solid #006400;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.8em;
+      color: #006400;
+      box-shadow: 0 0 0 2px white;
+    }
+
+    .stop-card {
+      flex: 1;
+    }
+
+    .stop-card a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       text-decoration: none;
       color: #222;
-      padding: 12px 16px;
+      padding: 10px 14px;
       background: #f9f9f9;
       border-left: 4px solid #006400;
       transition: background 0.15s;
       font-size: 0.95em;
     }
 
-    .site-list li a:hover { background: #e8f5e8; }
+    .stop-card a:hover { background: #e8f5e8; }
 
-    .site-num {
-      display: inline-flex;
+    .stop-ja { font-weight: bold; }
+    .stop-en { font-size: 0.72em; color: #888; margin-left: auto; letter-spacing: 1px; }
+
+    /* 発車案内板 */
+    .dep-board {
+      background: #0a0a0a;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .dep-board-header {
+      color: #ccc;
+      font-size: 0.7em;
+      letter-spacing: 3px;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #333;
+    }
+
+    .dep-row {
+      display: flex;
       align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      background: #006400;
-      color: white;
-      border-radius: 50%;
+      gap: 12px;
+      padding: 5px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 0.78em;
+    }
+
+    .dep-row:last-child { border-bottom: none; }
+
+    .dep-num {
+      color: #f0c020;
+      min-width: 20px;
       font-weight: bold;
+    }
+
+    .dep-dest {
+      color: #f0f0f0;
+      flex: 1;
+    }
+
+    .dep-type {
+      color: #88dd88;
       font-size: 0.85em;
-      flex-shrink: 0;
+      min-width: 80px;
+      text-align: center;
+      background: #1a331a;
+      padding: 1px 6px;
+      border-radius: 2px;
+    }
+
+    .dep-track {
+      color: #88aaff;
+      min-width: 50px;
+      text-align: right;
     }
 
     /* 数当てゲーム */
@@ -136,10 +437,7 @@
       flex-wrap: wrap;
     }
 
-    #guessGame label {
-      font-size: 0.88em;
-      color: #444;
-    }
+    #guessGame label { font-size: 0.88em; color: #444; }
 
     #guessField {
       width: 80px;
@@ -157,18 +455,9 @@
       border-radius: 2px;
     }
 
-    #guessSubmit {
-      background: #006400;
-      color: white;
-    }
-
+    #guessSubmit { background: #006400; color: white; }
     #guessSubmit:hover { background: #004d00; }
-
-    #guessReset {
-      background: #e0e0e0;
-      color: #444;
-    }
-
+    #guessReset { background: #e0e0e0; color: #444; }
     #guessReset:hover { background: #ccc; }
 
     #guessResult {
@@ -180,8 +469,9 @@
 
     /* フッター */
     footer {
-      background: #006400;
-      color: rgba(255,255,255,0.7);
+      background: #004d00;
+      border-top: 4px solid #f0c020;
+      color: rgba(255,255,255,0.6);
       text-align: center;
       padding: 16px;
       font-size: 0.75em;
@@ -191,31 +481,154 @@
 </head>
 <body>
 
+<!-- 駅名標ヘッダー -->
 <header>
-  <div class="logo">STORES</div>
-  <div class="tagline">Personal Website — Moving forward with you</div>
+  <div class="station-sign">
+    <div class="neighbor left">
+      <span class="neighbor-arrow">←</span>
+      <div>
+        <div style="font-size:0.85em">まえのえき</div>
+        <div style="font-size:1.1em;color:white">前の駅</div>
+      </div>
+    </div>
+    <div class="station-main">
+      <div class="station-reading">ストアーズ</div>
+      <div class="station-name">STORES</div>
+      <div class="station-en">Personal Website</div>
+    </div>
+    <div class="neighbor right">
+      <div style="text-align:right">
+        <div style="font-size:0.85em">つぎのえき</div>
+        <div style="font-size:1.1em;color:white">次の駅</div>
+      </div>
+      <span class="neighbor-arrow">→</span>
+    </div>
+  </div>
+  <div class="line-bar">
+    <span class="line-badge">JR Personal Line</span>
+    <span class="line-info">Moving forward with you</span>
+  </div>
 </header>
 
 <nav>
-  <a href="index.html">トップ</a>
-  <a href="pokemon.html">ポケモンガチャ</a>
-  <a href="castles.html">日本の名城</a>
-  <a href="visited.html">訪問マップ</a>
+  <a href="index.html">🚉 トップ</a>
+  <a href="pokemon.html">🎮 ポケモンガチャ</a>
+  <a href="castles.html">🏯 日本の名城</a>
+  <a href="visited.html">🗾 訪問マップ</a>
 </nav>
 
+<!-- 電車アニメーション帯 -->
+<div class="train-band">
+  <div class="track"></div>
+  <div class="train">
+    <!-- ノーズ -->
+    <div class="car car-head">
+      <div style="display:flex;align-items:flex-end">
+        <div class="car-nose">
+          <div class="car-light"></div>
+        </div>
+        <div class="car-body">
+          <div class="car-windows">
+            <div class="win"></div><div class="win"></div><div class="win"></div>
+          </div>
+        </div>
+      </div>
+      <div class="car-wheels">
+        <div class="wheel"></div><div class="wheel"></div>
+      </div>
+    </div>
+    <!-- 中間車両 -->
+    <div class="car">
+      <div class="coupler"></div>
+      <div class="car-body">
+        <div class="car-windows">
+          <div class="win"></div><div class="win"></div><div class="win"></div>
+        </div>
+      </div>
+      <div class="car-wheels">
+        <div class="wheel"></div><div class="wheel"></div>
+      </div>
+    </div>
+    <div class="car">
+      <div class="coupler"></div>
+      <div class="car-body">
+        <div class="car-windows">
+          <div class="win"></div><div class="win"></div><div class="win"></div>
+        </div>
+      </div>
+      <div class="car-wheels">
+        <div class="wheel"></div><div class="wheel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <main>
+  <!-- 発車案内板 -->
   <div class="section">
-    <h2>サイト一覧</h2>
-    <ul class="site-list">
-      <li><a href="pokemon.html"><span class="site-num">1</span>ポケモンガチャ</a></li>
-      <li><a href="castles.html"><span class="site-num">2</span>日本の名城</a></li>
-      <li><a href="visited.html"><span class="site-num">3</span>訪問マップ</a></li>
-    </ul>
+    <h2>🚂 発車案内 — Departures</h2>
+    <div class="dep-board">
+      <div class="dep-board-header">▌ NEXT DEPARTURES</div>
+      <div class="dep-row">
+        <span class="dep-num">1</span>
+        <span class="dep-dest">ポケモンガチャ</span>
+        <span class="dep-type">ガチャ急行</span>
+        <span class="dep-track">→ pokemon.html</span>
+      </div>
+      <div class="dep-row">
+        <span class="dep-num">2</span>
+        <span class="dep-dest">日本の名城</span>
+        <span class="dep-type">名城特急</span>
+        <span class="dep-track">→ castles.html</span>
+      </div>
+      <div class="dep-row">
+        <span class="dep-num">3</span>
+        <span class="dep-dest">訪問マップ</span>
+        <span class="dep-type">訪問各停</span>
+        <span class="dep-track">→ visited.html</span>
+      </div>
+    </div>
   </div>
 
+  <!-- 路線図スタイル サイト一覧 -->
   <div class="section">
-    <h2>数当てゲームでサイトを開こう！</h2>
-    <p class="guess-desc">1〜3の数字を当てると、その番号のサイトに移動します。</p>
+    <h2>🗺 路線図 — Site Map</h2>
+    <div class="route-map">
+      <div class="route-rail"></div>
+      <div class="route-stop">
+        <div class="stop-circle">1</div>
+        <div class="stop-card">
+          <a href="pokemon.html">
+            <span class="stop-ja">🎮 ポケモンガチャ</span>
+            <span class="stop-en">Pokémon Gacha</span>
+          </a>
+        </div>
+      </div>
+      <div class="route-stop">
+        <div class="stop-circle">2</div>
+        <div class="stop-card">
+          <a href="castles.html">
+            <span class="stop-ja">🏯 日本の名城</span>
+            <span class="stop-en">Japanese Castles</span>
+          </a>
+        </div>
+      </div>
+      <div class="route-stop">
+        <div class="stop-circle">3</div>
+        <div class="stop-card">
+          <a href="visited.html">
+            <span class="stop-ja">🗾 訪問マップ</span>
+            <span class="stop-en">Visit Map</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数当てゲーム -->
+  <div class="section">
+    <h2>🎯 番線ガチャ — どの行き先に乗る？</h2>
+    <p class="guess-desc">1〜3の番線を当てると、その番線のサイトに移動します。</p>
     <div id="guessGame">
       <label for="guessField">予想:</label>
       <input type="number" min="1" max="3" id="guessField">
@@ -227,7 +640,7 @@
 </main>
 
 <footer>
-  &copy; 2026 Example Website
+  &copy; 2026 STORES Personal Website — JR Personal Line
 </footer>
 
 <script>
@@ -245,7 +658,7 @@
   document.querySelector('#guessSubmit').addEventListener('click', function() {
     let userGuess = Number(guessField.value);
     if (userGuess === answerNumber) {
-      guessResult.textContent = '正解！' + answerNumber + '番のサイトに移動します...';
+      guessResult.textContent = '正解！' + answerNumber + '番線のサイトに移動します...';
       setTimeout(function() {
         window.location.href = sites[answerNumber];
       }, 1200);
